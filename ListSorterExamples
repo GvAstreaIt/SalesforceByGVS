@@ -1,0 +1,168 @@
+/** sObject List Sorter **/
+
+<apex:page controller="sObjectSortctr">
+  <apex:form >
+      <div>
+          <div style="float:left;width:50%">
+              <b>Contact In ASC </b>
+              <table>
+                  <apex:repeat value="{!listfirst}" var="con">
+                      <tr> <td>{!con.name} </td>
+                         <td><apex:outputText value="{0, date, MMMM d','  yyyy}">
+                            <apex:param value="{!con.Birthdate}" /> 
+                        </apex:outputText> </td>
+                      </tr>
+                  </apex:repeat>
+              </table>
+          </div>
+          <div style="float:right;width:50%">
+              <b>Contact In DESC </b>
+              <table>
+                  <apex:repeat value="{!listsecond}" var="con">
+                      <tr> <td>{!con.name} </td>
+                       <td><apex:outputText value="{0, date, MMMM d','  yyyy}">
+                            <apex:param value="{!con.Birthdate}" /> 
+                        </apex:outputText> </td>
+                      </tr>
+                  </apex:repeat>
+              </table>
+          </div>
+      </div>
+  </apex:form>
+</apex:page>
+
+/** Class for the above page **/
+
+public with sharing class sObjectSortctr {
+    Public List<contact> listfirst {get;set;}
+    Public List<contact> listsecond {get;set;}
+    
+    Public sObjectSortctr (){
+        List<contact> conlist=[select id,Name,account.name,Birthdate from contact where Birthdate !=null];
+        Sorter.Sort(conlist,'Birthdate','ASC');
+        listfirst =new List<Contact>();
+        listfirst.addall(conlist);
+    
+        Sorter.Sort(conlist,'Birthdate','DESC');
+        listsecond =new List<Contact>();
+        listsecond.addAll(conlist);
+   
+    }
+}
+
+/** Example for custom Class **/
+<apex:page controller="customClassSortCtr">
+  
+  <apex:form >
+      <div>
+          <div style="float:left;width:50%">
+              <b>Cust Class In ASC </b>
+              <table>
+                  <apex:repeat value="{!ascList}" var="con">
+                      <tr> <td>{!con.i} </td>
+                      <td><apex:outputText value="{0, date, MMMM d','  yyyy}">
+                            <apex:param value="{!con.dtm}" /> 
+                        </apex:outputText> </td></tr>
+                  </apex:repeat>
+              </table>
+          </div>
+          <div style="float:right;width:50%">
+              <b>Cust Class In DESC </b>
+              <table>
+                  <apex:repeat value="{!descList}" var="con">
+                      <tr> <td>{!con.i} </td>
+                      <td><apex:outputText value="{0, date, MMMM d','  yyyy}">
+                            <apex:param value="{!con.dtm}" /> 
+                        </apex:outputText> </td></tr>
+                  </apex:repeat>
+              </table>
+          </div>
+      </div>
+  </apex:form>
+</apex:page>
+                             
+ Public class customClassSortCtr{
+    Public List<custClass> ascList{get;set;}
+    Public List<custClass> descList{get;set;}
+    
+    Public customClassSortCtr(){
+        descList=new List<custClass>();
+        ascList=new List<custClass>();
+        List<custClass> thelist=new List<custClass>();
+       
+        for(Integer i=0;i<10;i++){
+            custClass ts=new custClass(system.now().adddays(i));
+            ts.i=i;
+            thelist.add(ts);
+        }
+        for(Integer i=10;i<20;i++){
+            custClass ts=new custClass(system.now().addyears(-1).adddays(i));
+            ts.i=i;
+            thelist.add(ts);
+        }
+            
+        Sorter.sort(thelist,'dtm','ASC','datetime');
+        ascList.addAll(thelist);
+        Sorter.sort(thelist,'dtm','DESC','datetime');
+        descList.addAll(thelist);
+    }
+    Public class custClass implements sortable {
+    Public Integer i {get;set;}
+    Public Date dt {get;set;}
+    Public DateTime dtm{get;set;}
+    Public custClass (Integer ii){
+        i=ii;
+    }
+    Public custClass (date d){
+        dt=d;
+    }
+     Public custClass (datetime d){
+        dtm=d;
+    }
+}
+}
+
+/** Example for relational sorter **/
+<apex:page controller="relationalSortctr">
+  
+  <apex:form >
+      <div>
+          <div style="float:left;width:50%">
+              <b>Contact In ASC </b>
+              <table>
+                  <apex:repeat value="{!listfirst}" var="con">
+                      <tr> <td>{!con.name} </td><td>{!con.account.name} </td></tr>
+                  </apex:repeat>
+              </table>
+          </div>
+          <div style="float:right;width:50%">
+              <b>Contact In DESC </b>
+              <table>
+                  <apex:repeat value="{!listsecond}" var="con">
+                      <tr> <td>{!con.name} </td><td>{!con.account.name} </td></tr>
+                  </apex:repeat>
+              </table>
+          </div>
+      </div>
+  </apex:form>
+</apex:page>
+
+/** class for the above page **/
+public with sharing class relationalSortctr {
+    Public List<contact> listfirst {get;set;}
+    Public List<contact> listsecond {get;set;}
+    
+    Public relationalSortctr (){
+        List<contact> conlist=[select id,Name,account.name from contact where account.name !=null];
+        Sorter.Sort(conlist,'account.name','ASC');
+        listfirst =new List<Contact>();
+        listfirst.addall(conlist);
+    
+        Sorter.Sort(conlist,'account.name','DESC');
+        listsecond =new List<Contact>();
+        listsecond.addAll(conlist);
+   
+    }
+}
+                            
+                            
